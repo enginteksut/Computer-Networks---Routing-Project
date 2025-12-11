@@ -9,6 +9,27 @@ Bu proje, **2025-2026 Güz Dönemi Bilgisayar Ağları (BSM307)** dersi kapsamı
 
 Proje, karmaşık ağ topolojilerinde en optimum yolu bulmak için klasik algoritmaların yanı sıra **Meta-Sezgisel** ve **Pekiştirmeli Öğrenme** yaklaşımlarını hibrit bir yapıda kullanmayı hedefler.
 
+## 📸 Arayüz ve Simülasyon (GUI)
+
+Proje, algoritmaların performansını anlık olarak izlemek için **PyQt5** tabanlı, modern bir arayüze sahiptir.
+
+<table width="100%">
+  <tr>
+    <th colspan="2" align="center">🌙 Deep Ocean (Karanlık Mod)</th>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/arayuzkoyu1.png" alt="Karanlık Mod 1" width="100%"></td>
+    <td width="50%"><img src="screenshots/arayuzkoyu2.png" alt="Karanlık Mod 2" width="100%"></td>
+  </tr>
+  <tr>
+    <th colspan="2" align="center">☀️ Corporate (Aydınlık Mod)</th>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/arayuzacik1.png" alt="Aydınlık Mod 1" width="100%"></td>
+    <td width="50%"><img src="screenshots/arayuzacik2.png" alt="Aydınlık Mod 2" width="100%"></td>
+  </tr>
+</table>
+
 ## 🎯 Proje Amacı ve Kapsam
 
 250 düğümlü karmaşık bir ağ üzerinde, aşağıdaki çelişen hedeflerin optimize edilmesi amaçlanmıştır:
@@ -16,32 +37,7 @@ Proje, karmaşık ağ topolojilerinde en optimum yolu bulmak için klasik algori
 * 🛡️ **En Yüksek Güvenilirlik (Maximum Reliability)**
 * 💰 **En Az Kaynak Maliyeti (Minimum Resource Cost)**
 
-## 📸 Arayüz ve Simülasyon (GUI)
-
-Proje, algoritmaların performansını anlık olarak izlemek için **PyQt5** tabanlı, modern bir arayüze sahiptir.
-
-### 🌙 Deep Ocean (Karanlık) & ☀️ Corporate (Aydınlık) Modları
-
-<table>
-  <tr>
-    <td align="center"><b>Karanlık Mod - Genel Görünüm</b></td>
-    <td align="center"><b>Aydınlık Mod - Genel Görünüm</b></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/arayuzkoyu1.png" width="400" alt="Karanlık Mod 1"></td>
-    <td><img src="screenshots/arayuzacik1.png" width="400" alt="Aydınlık Mod 1"></td>
-  </tr>
-  <tr>
-    <td align="center"><b>Karanlık Mod - Rota Hesaplama</b></td>
-    <td align="center"><b>Aydınlık Mod - Rota Hesaplama</b></td>
-  </tr>
-  <tr>
-    <td><img src="screenshots/arayuzkoyu2.png" width="400" alt="Karanlık Mod 2"></td>
-    <td><img src="screenshots/arayuzacik2.png" width="400" alt="Aydınlık Mod 2"></td>
-  </tr>
-</table>
-
-### ✨ Arayüz Özellikleri
+## ✨ Arayüz Özellikleri
 * **Dinamik Dashboard:** Rota metriklerini (Gecikme, Maliyet) anlık gösteren kart yapısı.
 * **Neon Görselleştirme:** Aktif rotayı parlama (glow) efektiyle vurgulayan Matplotlib motoru.
 * **Akıllı Kontroller:** Kaynak/Hedef seçimi ve QoS ağırlıklarının slider ile yönetimi.
