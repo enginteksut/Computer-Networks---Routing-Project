@@ -67,3 +67,4 @@ pip install -r requirements.txt
 
 # 4. Uygulamayı başlatın
 python main.py
+👥 Proje Ekibi (Grup 6)Ad SoyadGörev AlanıSorumluluklarYusuf Meydan  Mustafa Kağan ErenArayüz (GUI) GeliştirmeDashboard Tasarımı, Matplotlib Motoru, UX/UI, Veri Akışı ve Kontrol MantığıEngin TekşutPekiştirmeli ÖğrenmeQ-Learning, Q-Table Yönetimi, Ajan-Çevre Etkileşimi, Ödül FonksiyonuMuhammad Dhafin Faza  Wahidullah OmariGenetik Algoritma (GA)Popülasyon Yönetimi, Fitness Fonksiyonları, Evrimsel SüreçlerEmirhan Laleli  Ahmet Adnan DamarPSO (Parçacık Sürüsü)Sürü Zekası Optimizasyonu, Hız/Konum Vektörleri, Ayrık Yapıya GeçişJahangir Babayev  Halil Talha BayrakBenzetimli Tavlama (SA)Soğutma Stratejileri, Olasılıksal Kabul FonksiyonlarıBartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü
