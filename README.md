@@ -51,6 +51,11 @@ Proje mimarisi modüler bir yapıda tasarlanmış olup, aşağıdaki algoritmala
 3.  **Q-Learning (RL):** Ajan tabanlı öğrenme, Bellman denklemi ile Q-Tablosu güncellemesi ve Epsilon-Greedy yaklaşımı.
 4.  **Parçacık Sürüsü Optimizasyonu (PSO):** Sürü zekası ile hız ve konum güncelleme vektörleri.
 
+👥 Proje Ekibi (Grup 6)
+Aşağıda proje geliştirme sürecinde görev alan ekip üyeleri ve sorumlulukları yer almaktadır:
+
+Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü
+
 ## 🛠️ Kurulum
 
 Projeyi yerel ortamınızda çalıştırmak için:
@@ -67,4 +72,3 @@ pip install -r requirements.txt
 
 # 4. Uygulamayı başlatın
 python main.py
-👥 Proje Ekibi (Grup 6)Ad SoyadGörev AlanıSorumluluklarYusuf Meydan  Mustafa Kağan ErenArayüz (GUI) GeliştirmeDashboard Tasarımı, Matplotlib Motoru, UX/UI, Veri Akışı ve Kontrol MantığıEngin TekşutPekiştirmeli ÖğrenmeQ-Learning, Q-Table Yönetimi, Ajan-Çevre Etkileşimi, Ödül FonksiyonuMuhammad Dhafin Faza  Wahidullah OmariGenetik Algoritma (GA)Popülasyon Yönetimi, Fitness Fonksiyonları, Evrimsel SüreçlerEmirhan Laleli  Ahmet Adnan DamarPSO (Parçacık Sürüsü)Sürü Zekası Optimizasyonu, Hız/Konum Vektörleri, Ayrık Yapıya GeçişJahangir Babayev  Halil Talha BayrakBenzetimli Tavlama (SA)Soğutma Stratejileri, Olasılıksal Kabul FonksiyonlarıBartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü
