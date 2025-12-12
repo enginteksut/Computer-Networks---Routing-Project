@@ -77,4 +77,4 @@ python main.py
 ---
 <div align="center">
   <b>Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü</b>
-</div>
+</div>   
