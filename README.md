@@ -72,9 +72,8 @@ cd Computer-Networks---Routing-Project
 pip install -r requirements.txt
 
 # 4. Uygulamayı başlatın
-python main.py 
-
----
+python main.py
+```
 <div align="center">
-  <b>Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü</b>
-</div>   
+
+<b>Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü</b></div>
