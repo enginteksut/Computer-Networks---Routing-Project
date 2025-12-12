@@ -51,10 +51,11 @@ Proje mimarisi modüler bir yapıda tasarlanmış olup, aşağıdaki algoritmala
 3.  **Q-Learning (RL):** Ajan tabanlı öğrenme, Bellman denklemi ile Q-Tablosu güncellemesi ve Epsilon-Greedy yaklaşımı.
 4.  **Parçacık Sürüsü Optimizasyonu (PSO):** Sürü zekası ile hız ve konum güncelleme vektörleri.
 
-👥 Proje Ekibi (Grup 6)
+## 👥 Proje Ekibi (Grup 6)
+
 Aşağıda proje geliştirme sürecinde görev alan ekip üyeleri ve sorumlulukları yer almaktadır:
 
-Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü
+![Proje Ekibi Tablosu](screenshots/uyeler_tablo.png)
 
 ## 🛠️ Kurulum
 
@@ -71,4 +72,9 @@ cd Computer-Networks---Routing-Project
 pip install -r requirements.txt
 
 # 4. Uygulamayı başlatın
-python main.py
+python main.py 
+
+---
+<div align="center">
+  <b>Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü</b>
+</div>
