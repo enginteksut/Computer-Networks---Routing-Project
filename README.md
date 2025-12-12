@@ -67,17 +67,3 @@ pip install -r requirements.txt
 
 # 4. Uygulamayı başlatın
 python main.py
-
-## 👥 Proje Ekibi (Grup 6)
-
-| Ad Soyad | Görev Alanı | Sorumluluklar |
-| :--- | :--- | :--- |
-| **Yusuf Meydan** | **Arayüz Mimarisi & Görselleştirme** | Dashboard Tasarımı, Matplotlib Motoru, UX/UI, Tema Yönetimi |
-| **Mustafa Kağan Eren** | **Kontrol Paneli & Mantık** | Arayüz Fonksiyonelliği, Veri Akışı ve Kontrol Mantığı |
-| **Engin Tekşut** | **Pekiştirmeli Öğrenme** | Q-Learning, Q-Table Yönetimi, Ajan-Çevre Etkileşimi |
-| **Muhammad Dhafin Faza** <br> **Wahidullah Omari** | **Genetik Algoritma (GA)** | Popülasyon Yönetimi, Fitness Fonksiyonları, Evrimsel Süreçler |
-| **Emirhan Laleli** <br> **Ahmet Adnan Damar** | **PSO (Parçacık Sürüsü)** | Sürü Zekası Optimizasyonu, Hız/Konum Vektörleri |
-| **Jahangir Babayev** <br> **Halil Talha Bayrak** | **Benzetimli Tavlama (SA)** | Soğutma Stratejileri, Olasılıksal Kabul Fonksiyonları |
-
----
-*Bartın Üniversitesi - Bilgisayar Teknolojisi ve Bilişim Sistemleri Bölümü*
