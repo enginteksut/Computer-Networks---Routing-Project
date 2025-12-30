@@ -205,13 +205,3 @@ numpy>=1.24.0
 - [ ] 3D ağ görselleştirmesi
 
 ---
-
-## 📞 Destek
-
-Herhangi bir sorun veya öneriniz varsa lütfen iletişime geçin.
-
----
-
-**Version**: 2.0.0  
-**Last Updated**: 2024  
-**License**: MIT
