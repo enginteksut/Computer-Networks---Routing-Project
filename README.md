@@ -1,10 +1,8 @@
 # 📡 Multi-QoS Network Routing Optimization System
 
 > **Proje:** Bilgisayar Ağları Dönem Projesi  
-> **Üniversite:** [Üniversite Adı]  
-> **Ders:** BSM307/317 - Bilgisayar Ağları  
-> **Dönem:** Güz 2025  
-> **Teslim Tarihi:** 31 Aralık 2025
+> **Üniversite:** Bartın Üniversitesi  
+> **Ders:**  Bilgisayar Ağları
 
 ---
 
@@ -56,7 +54,7 @@ Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyon
 ### 1. Depoyu Klonlayın
 
 ```bash
-git clone https://github.com/[kullanici_adi]/network-qos-routing.git
+git clone https://github.com/enginteksut/Computer-Networks---Routing-Project.git
 cd network-qos-routing
 ```
 
