@@ -1,23 +1,20 @@
 # 📡 Multi-QoS Network Routing Optimization System
 
 > **Proje:** Bilgisayar Ağları Dönem Projesi  
-> **Üniversite:** [Üniversite Adı]  
-> **Ders:** BSM307/317 - Bilgisayar Ağları  
-> **Dönem:** Güz 2025  
-> **Teslim Tarihi:** 31 Aralık 2025
+> **Üniversite:** Bartın Üniversitesi  
+> **Ders:**  Bilgisayar Ağları
 
 ---
 
 ## 📋 Proje Özeti
 
-Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyonu** problemini ele almaktadır. Kullanıcı dostu PyQt5 arayüzü ile 5 farklı optimizasyon algoritmasını karşılaştırmalı olarak test edebilirsiniz.
+Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyonu** problemini ele almaktadır. Kullanıcı dostu PyQt5 arayüzü ile 4 farklı optimizasyon algoritmasını karşılaştırmalı olarak test edebilirsiniz.
 
 ### 🎯 Temel Özellikler
 
 - **Trade-off Mekanizması**: Fiber (hızlı-riskli), Microwave (dengeli), Satellite (yavaş-güvenli) link tipleri
 - **3 QoS Kriteri**: Gecikme (Delay), Güvenilirlik (Reliability), Kaynak Kullanımı (Resource)
-- **5 Algoritma Desteği**: 
-  - Dijkstra (Baseline)
+- **4 Algoritma Desteği**: 
   - Q-Learning (Pekiştirmeli Öğrenme)
   - PSO (Parçacık Sürü Optimizasyonu)
   - Genetik Algoritma (Evrimsel Hesaplama)
@@ -31,13 +28,18 @@ Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyon
 ## 🖥️ Ekran Görüntüleri
 
 ### Ana Ekran (Tek Algoritma Modu)
-![Ana Ekran](screenshots/main_screen.png)
+![Ana Ekran](screenshots/Ana_Ekran.png)
 
 ### Karşılaştırma Ekranı (Multi-Algoritma)
-![Karşılaştırma Ekranı](screenshots/comparison_screen.png)
+![Karşılaştırma Ekranı](screenshots/Karsilastirma.png)
 
 ### Raporlar Ekranı
-![Raporlar Ekranı](screenshots/reports_screen.png)
+![Raporlar Ekranı](screenshots/Rapor1.png)
+
+![Raporlar Ekranı](screenshots/Rapo2.png)
+
+### Konsol Ekranı
+![Konsol Ekranı](screenshots/Konsol.png)
 
 ---
 
@@ -51,7 +53,7 @@ Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyon
 ### 1. Depoyu Klonlayın
 
 ```bash
-git clone https://github.com/[kullanici_adi]/network-qos-routing.git
+git clone https://github.com/enginteksut/Computer-Networks---Routing-Project.git
 cd network-qos-routing
 ```
 
@@ -225,7 +227,6 @@ project/
 
 | Algoritma | Hız | Çözüm Kalitesi | Bellek Kullanımı | En İyi Senaryo |
 |-----------|-----|----------------|------------------|----------------|
-| **Dijkstra** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Küçük ağlar, hızlı sonuç |
 | **Q-Learning** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | Dinamik ağlar, öğrenme gerekli |
 | **PSO** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Global optimum aranıyor |
 | **Genetik** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | Karmaşık kısıtlar |
