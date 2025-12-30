@@ -482,7 +482,7 @@ class SimulatedAnnealingRouting:
         # En iyi çözüm
         best_path = current_path.copy()
         best_cost = current_cost
-        best_metrics = current_metrics.copy()
+        best_metrics = current_metrics.copy() if current_metrics else {}
         
         # Sıcaklık
         T = self.initial_temp
@@ -554,7 +554,7 @@ class SimulatedAnnealingRouting:
                     if current_cost < best_cost:
                         best_path = current_path.copy()
                         best_cost = current_cost
-                        best_metrics = current_metrics.copy()
+                        best_metrics = current_metrics.copy() if current_metrics else {}
                         self.no_improve_counter = 0
                         
                         if self.verbose and self.iteration_count % 100 == 0:
@@ -818,7 +818,7 @@ if __name__ == "__main__":
     print("[1/5] Veri dosyaları yükleniyor...")
     nodes, edges, demands = load_and_clean_data()
     
-    if nodes is not None:
+    if nodes is not None and edges is not None and demands is not None:
         print(f"[✓] {len(nodes)} düğüm, {len(edges)} kenar, {len(demands)} talep yüklendi.\n")
         
         # Grafiği oluştur
