@@ -233,6 +233,13 @@ class TopologyManager:
             # ===== 1. Q-LEARNING ALGORİTMASI =====
             # Pekiştirmeli öğrenme tabanlı rota optimizasyonu
             if "Q-Learning" in algorithm:
+                # Seed ayarla (checkbox açıksa)
+                seed_value = algo_params.get('seed', None)
+                if seed_value is not None:
+                    random.seed(seed_value)
+                    import numpy as np
+                    np.random.seed(seed_value)
+                
                 router = QLearningRouter(
                     alpha=algo_params.get('alpha', 0.1),          # Öğrenme hızı
                     gamma=algo_params.get('gamma', 0.9),          # İndirim faktörü
@@ -258,6 +265,13 @@ class TopologyManager:
             elif "PSO" in algorithm:
                 from Algorithms.pso import QoS_PSO_Solver
                 
+                # Seed ayarla (checkbox açıksa)
+                seed_value = algo_params.get('seed', None)
+                if seed_value is not None:
+                    random.seed(seed_value)
+                    import numpy as np
+                    np.random.seed(seed_value)
+                
                 # PSO solver'ı başlat (self.G'yi doğrudan kullan)
                 pso_solver = QoS_PSO_Solver(G=self.G) 
                 
@@ -279,6 +293,13 @@ class TopologyManager:
             # ===== 3. GENETİK ALGORİTMA =====
             # Evrimsel hesaplama tabanlı optimizasyon
             elif "Genetik" in algorithm:
+                # Seed ayarla (checkbox açıksa)
+                seed_value = algo_params.get('seed', None)
+                if seed_value is not None:
+                    random.seed(seed_value)
+                    import numpy as np
+                    np.random.seed(seed_value)
+                
                 ga_solver = GenetikAlgorithm()
                 
                 # GA'nın beklediği ağırlık sözlüğünü hazırla
@@ -311,12 +332,20 @@ class TopologyManager:
             # ===== 4. BENZETİMLİ TAVLAMA (Simulated Annealing) =====
             # Metalurjideki tavlama sürecinden esinlenmiş lokal arama
             elif "SA" in algorithm or "Benzetimli" in algorithm:
+                # Seed ayarla (checkbox açıksa)
+                seed_value = algo_params.get('seed', None)
+                if seed_value is not None:
+                    random.seed(seed_value)
+                    import numpy as np
+                    np.random.seed(seed_value)
+                
                 sa_weights = {
                     'delay': wd,
                     'reliability': wr,
                     'resource': wres
                 }
                 print(f"\n[SA] Benzetimli Tavlama başlatılıyor: {source} → {target}")
+                print(f"[SA] Seed: {seed_value if seed_value is not None else 'Rastgele'}")
                 
                 # SA algoritmasını çalıştır (sıcaklık azaltma ile lokal optimum kaçışı)
                 result = calculate_route_with_sa(
@@ -380,7 +409,7 @@ class TopologyManager:
             print(f"Hata oluştu: {e}")
             return None
     
-    def build_from_csv(self, node_file, edge_file):
+    def build_from_csv(self, node_file, edge_file, seed=None):
         """
         CSV dosyalarından ağ topolojisi yükler.
         
@@ -395,6 +424,10 @@ class TopologyManager:
             edge_file (str): Kenar özelliklerini içeren CSV dosya yolu
                 Format: src; dst; capacity_mbps; delay_ms; reliability_link
                 Örnek: 0;1;500;3.5;0.95
+            
+            seed (int, optional): Düğüm konumları için seed değeri.
+                Aynı seed ile aynı görsel düzenleme elde edilir.
+                Ağ yapısı değişmez, sadece layout değişir.
         
         Returns:
             tuple: (G, pos, success)
@@ -407,6 +440,7 @@ class TopologyManager:
             - Ondalık ayırıcı: virgül veya nokta (otomatik dönüşüm)
             - UTF-8-SIG encoding (BOM karakteri desteği)
             - İlk satır başlık olarak atlanır
+            - Seed sadece görsel düzenlemeyi etkiler, ağ yapısını değil!
         """
         try:
             self.G = nx.Graph()  # Yönsüz graf başlat
@@ -470,8 +504,10 @@ class TopologyManager:
                 # (Şimdilik pas geçildi)
                 pass
             
-            # Görselleştirme için pozisyonları ayarla
-            self.pos = nx.spring_layout(self.G, seed=42)
+            # Görselleştirme için pozisyonları ayarla (seed kullanarak)
+            # Aynı seed ile aynı görsel düzenleme, ağ yapısı aynı kalır
+            layout_seed = seed if seed is not None else 42
+            self.pos = nx.spring_layout(self.G, seed=layout_seed)
             self.num_nodes = len(self.G.nodes())
             
             return self.G, self.pos, True  # Başarılı

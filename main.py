@@ -388,26 +388,92 @@ class MainWindow(QMainWindow):
     
     # ===== SEED MANAGEMENT =====
     
+    def on_seed_checkbox_changed(self, state):
+        """Seed checkbox durumu değiştiğinde input'u aktif/pasif yap"""
+        is_checked = state == 2  # Qt.CheckState.Checked
+        self.seed_input.setEnabled(is_checked)
+        
+        if is_checked:
+            seed_value = self.seed_input.value()
+            self.lbl_seed_info.setText(f"✅ Seed aktif: {seed_value}")
+            self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+        else:
+            self.lbl_seed_info.setText("ℹ️ Seed kapalı (Varsayılan mod)")
+            self.lbl_seed_info.setStyleSheet("color: #6b7280; font-size: 10px; font-style: italic;")
+    
     def on_seed_changed(self, value):
-        """
-        Seed değeri değiştiğinde bilgi etiketini günceller.
-        Ağı yeniden oluşturmaz, sadece görsel feedback verir.
-        """
-        self.lbl_seed_info.setText(f"💡 Seed: {value} (Henüz uygulanmadı)")
-        self.lbl_seed_info.setStyleSheet("color: #f59e0b; font-size: 10px; font-style: italic;")
+        """Seed değeri değiştiğinde bilgi etiketini güncelle"""
+        self.current_seed = value
+        if self.seed_checkbox.isChecked():
+            self.lbl_seed_info.setText(f"✅ Seed aktif: {value}")
+            self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
     
     def create_network_with_seed(self):
         """
-        Kullanıcının girdiği seed değeri ile yeni ağ topolojisi oluşturur.
-        Aynı seed değeri her zaman aynı ağı üretir.
+        Kullanıcının girdiği seed değeri ile ağ oluşturur.
+        
+        İki mod:
+        1. CSV yüklüyse: Aynı CSV'yi yeni seed ile tekrar yükler (layout değişir)
+        2. CSV yoksa: Rastgele ağ oluşturur (250 düğüm)
         """
         try:
             seed_value = self.seed_input.value()
             self.current_seed = seed_value
             
-            # Yeni ağ oluştur
-            self.G, self.network_pos = self.manager.create_network(seed=seed_value)
+            # CSV yüklü mü kontrol et
+            if hasattr(self, 'csv_loaded') and self.csv_loaded and hasattr(self, 'csv_node_file'):
+                # CSV MOD: Aynı CSV'yi farklı seed ile yükle
+                G, pos, success = self.manager.build_from_csv(
+                    self.csv_node_file, 
+                    self.csv_edge_file, 
+                    seed=seed_value
+                )
+                
+                if success and G is not None:
+                    self.G = G
+                    self.network_pos = pos
+                    
+                    node_count = len(G.nodes())
+                    edge_count = len(G.edges())
+                    
+                    # Header güncelle
+                    if hasattr(self, 'lbl_graph_header'):
+                        self.lbl_graph_header.setText(f"CSV (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
+                    
+                    # Bilgi etiketi
+                    self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (CSV aktif)")
+                    self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+                    
+                    # Konsol log
+                    try:
+                        self.append_console(f"[CSV+SEED] Aynı ağ, farklı layout (Seed: {seed_value})", "info")
+                    except:
+                        pass
+                else:
+                    raise Exception("CSV tekrar yüklenemedi")
             
+            else:
+                # RASTGELE MOD: Yeni ağ oluştur
+                self.G, self.network_pos = self.manager.create_network(seed=seed_value)
+                
+                node_count = len(self.G.nodes())
+                edge_count = len(self.G.edges())
+                
+                # Header güncelle
+                if hasattr(self, 'lbl_graph_header'):
+                    self.lbl_graph_header.setText(f"AĞ OLUŞTURULDU (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
+                
+                # Bilgi etiketi
+                self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (Aktif)")
+                self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+                
+                # Konsol log
+                try:
+                    self.append_console(f"[SİSTEM] Rastgele ağ oluşturuldu (Seed: {seed_value}, Düğüm: {node_count})", "success")
+                except:
+                    pass
+            
+            # Ortak işlemler
             # Combobox'ları güncelle
             if hasattr(self, 'combo_source') and hasattr(self, 'combo_target'):
                 self.populate_combos()
@@ -415,22 +481,6 @@ class MainWindow(QMainWindow):
             # Grafiği çiz
             if hasattr(self, 'canvas'):
                 self.canvas.draw_network(self.G, self.network_pos)
-            
-            # Bilgi etiketini güncelle
-            self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (Aktif)")
-            self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
-            
-            # Header güncelle
-            node_count = len(self.G.nodes())
-            edge_count = len(self.G.edges())
-            if hasattr(self, 'lbl_graph_header'):
-                self.lbl_graph_header.setText(f"AĞ OLUŞTURULDU (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
-            
-            # Konsola log (eğer konsol hazırsa)
-            try:
-                self.append_console(f"[SİSTEM] Ağ topolojisi oluşturuldu (Seed: {seed_value}, Düğüm: {node_count}, Kenar: {edge_count})", "success")
-            except:
-                pass  # Konsol henüz hazır değilse sessizce geç
             
             # Metrikleri sıfırla
             self.current_path = None
@@ -448,7 +498,10 @@ class MainWindow(QMainWindow):
     # ===== FILE OPERATIONS =====
         
     def load_graph_from_file(self):
-        """Hocanın CSV dosyalarını sırayla yükler ve arayüzü günceller."""
+        """
+        CSV dosyalarını yükler ve arayüzü günceller.
+        Dosya yolları kaydedilir, böylece seed ile tekrar yüklenebilir.
+        """
         
         # 1. NODE Dosyası Seçimi
         fname_node, _ = QFileDialog.getOpenFileName(self, '1. Adım: NodeData (Düğüm) Dosyası', '.', "CSV Files (*.csv);;All Files (*)")
@@ -458,13 +511,20 @@ class MainWindow(QMainWindow):
         fname_edge, _ = QFileDialog.getOpenFileName(self, '2. Adım: EdgeData (Kenar) Dosyası', '.', "CSV Files (*.csv);;All Files (*)")
         if not fname_edge: return
 
-        # 3. Yükleme İşlemi
-        G, pos, success = self.manager.build_from_csv(fname_node, fname_edge)
+        # Dosya yollarını kaydet (seed ile tekrar yüklemek için)
+        self.csv_node_file = fname_node
+        self.csv_edge_file = fname_edge
+        self.csv_loaded = True
+
+        # 3. Yükleme İşlemi (mevcut seed ile)
+        current_seed = self.seed_input.value() if hasattr(self, 'seed_input') else None
+        G, pos, success = self.manager.build_from_csv(fname_node, fname_edge, seed=current_seed)
         
         if success:
             self.G = G
             self.network_pos = pos
             self.current_path = None
+            self.current_seed = current_seed  # Seed'i kaydet
             
             # Comboboxları yeni düğüm sayısına göre güncelle
             self.populate_combos()
@@ -473,10 +533,22 @@ class MainWindow(QMainWindow):
             if self.G is not None:
                 node_count = len(self.G.nodes())
                 edge_count = len(self.G.edges())
-                self.lbl_graph_header.setText(f"VERİ YÜKLENDİ: {node_count} DÜĞÜM / {edge_count} KENAR")
+                seed_text = f" (SEED: {current_seed})" if current_seed else ""
+                self.lbl_graph_header.setText(f"CSV YÜKLENDİ{seed_text}: {node_count} DÜĞÜM / {edge_count} KENAR")
+            
+            # Seed bilgisini güncelle
+            if hasattr(self, 'lbl_seed_info') and current_seed:
+                self.lbl_seed_info.setText(f"✅ Seed: {current_seed} (CSV ile aktif)")
+                self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
             
             # Grafiği Çiz
             self.canvas.draw_network(self.G, self.network_pos)
+            
+            # Konsola log
+            try:
+                self.append_console(f"[CSV] Dosyalar yüklendi: {node_count} düğüm, {edge_count} kenar (Seed: {current_seed})", "success")
+            except:
+                pass
             
             # Kartları Sıfırla
             self.card_delay.findChild(QLabel, "MetricValue").setText("-")
@@ -575,63 +647,59 @@ class MainWindow(QMainWindow):
 
         # --- SOL PANEL (KONTROLLER) ---
         left_panel = QWidget()
-        left_panel.setFixedWidth(350)
+        left_panel.setMinimumWidth(300)
+        left_panel.setMaximumWidth(380)
+        left_panel.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         left_layout = QVBoxLayout()
-        left_layout.setSpacing(20) # Kartlar arası boşluk
+        left_layout.setSpacing(12) # Kartlar arası boşluk azaltıldı (20→12)
+        left_layout.setContentsMargins(10, 5, 10, 10) # Üst margin azaltıldı
         left_panel.setLayout(left_layout)
         
-        # 1. Header (Kontrol Paneli)
+        # 1. Header (Kontrol Paneli) - Kompakt
         self.header = QLabel("KONTROL PANELİ")
         self.header.setObjectName("HeaderLabel")
         self.header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.header.setStyleSheet("font-size: 16px; font-weight: bold; padding: 3px;")  # Daha kompakt
         shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(20)
-        shadow.setOffset(0, 5)
+        shadow.setBlurRadius(15)
+        shadow.setOffset(0, 3)
         self.header.setGraphicsEffect(shadow)
         left_layout.addWidget(self.header)
-        
-        # ... (self.header kodları bittikten sonra, card_route öncesine) ...
-        left_layout.addWidget(self.header)
 
-        # --- YENİ EKLENEN: DOSYA YÜKLEME KARTI ---
-        card_file = self.create_input_card("📁 Veri Kaynağı")
+        # --- DOSYA YÜKLEME KARTI (KOMPAKT) ---
+        card_file = self.create_input_card("📁 CSV Dosyaları")
         layout_file = QVBoxLayout()
-        layout_file.setContentsMargins(0, 5, 0, 5)
+        layout_file.setContentsMargins(0, 3, 0, 3)
         
-        self.btn_load_files = QPushButton("📂 CSV Dosyalarını Yükle")
-        self.btn_load_files.setFixedHeight(40)
+        self.btn_load_files = QPushButton("📂 Yükle")
+        self.btn_load_files.setFixedHeight(32)
         self.btn_load_files.setCursor(Qt.CursorShape.PointingHandCursor)
-        # Mevcut tasarıma uygun Mavi buton stili
         self.btn_load_files.setStyleSheet("""
             QPushButton {
                 background-color: #3b82f6; 
                 color: white; 
                 border: none; 
-                border-radius: 6px;
+                border-radius: 5px;
                 font-weight: bold;
-                font-size: 12px;
+                font-size: 11px;
             }
             QPushButton:hover { background-color: #2563eb; }
         """)
         self.btn_load_files.clicked.connect(self.load_graph_from_file)
         
         layout_file.addWidget(self.btn_load_files)
-        
-        # Bilgi Notu
-        lbl_info = QLabel("Sırasıyla Node ve Edge dosyalarını seçiniz.")
-        lbl_info.setStyleSheet("color: gray; font-size: 10px; font-style: italic;")
-        lbl_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout_file.addWidget(lbl_info)
 
         card_file.content_layout.addLayout(layout_file)
         left_layout.addWidget(card_file)
         # ---------------------------------------------
 
-        # 2. Rota Seçimi KARTI (İç boşluk azaltıldı)
-        card_route = self.create_input_card("📍 Rota ve Hedef Seçimi")
+        # 2. Rota Seçimi KARTI (KOMPAKT)
+        card_route = self.create_input_card("📍 Rota Seçimi")
         layout_route = QFormLayout()
-        layout_route.setSpacing(8) # Inputlar arası boşluk azaltıldı
-        layout_route.setContentsMargins(0,0,0,0) # Ekstra kenar boşlukları alındı
+        layout_route.setSpacing(6) # Inputlar arası boşluk daha da azaltıldı
+        layout_route.setContentsMargins(0,0,0,0)
+        layout_route.setVerticalSpacing(6)
+        layout_route.setHorizontalSpacing(5)
         
         # 1. Algoritma Seçim Kutusu
         self.combo_algo = QComboBox()
@@ -639,17 +707,17 @@ class MainWindow(QMainWindow):
         layout_route.addRow("Algoritma:", self.combo_algo)
         
         # Diğer Özellikler Butonu
-        self.btn_algo_params = QPushButton("⚙️ Diğer Özellikler")
-        self.btn_algo_params.setFixedHeight(30)
+        self.btn_algo_params = QPushButton("⚙️ Parametreler")
+        self.btn_algo_params.setFixedHeight(26)
         self.btn_algo_params.setStyleSheet("""
             QPushButton {
                 background-color: #6366f1; 
                 color: white; 
                 border: none; 
-                border-radius: 5px;
+                border-radius: 4px;
                 font-weight: bold;
-                font-size: 11px;
-                padding: 5px;
+                font-size: 10px;
+                padding: 3px;
             }
             QPushButton:hover { background-color: #4f46e5; }
         """)
@@ -679,53 +747,54 @@ class MainWindow(QMainWindow):
         card_route.content_layout.addLayout(layout_route)
         left_layout.addWidget(card_route)
 
-        # 2.5 SEED AYARI (Yeni Eklenen)
-        card_seed = self.create_input_card("🎲 Ağ Topoloji Seed'i")
+        # 2.5 SEED AYARI (ALGORİTMA İÇİN)
+        card_seed = self.create_input_card("🎲 Seed (Tekrarlanabilirlik)")
         layout_seed = QVBoxLayout()
-        layout_seed.setSpacing(8)
-        layout_seed.setContentsMargins(0, 5, 0, 5)
+        layout_seed.setSpacing(5)
+        layout_seed.setContentsMargins(0, 3, 0, 3)
         
-        # Seed input (0-9999 arası)
+        # Seed checkbox (Aktif/Pasif)
+        self.seed_checkbox = QCheckBox("Seed Kullan")
+        self.seed_checkbox.setChecked(False)  # Varsayılan kapalı
+        self.seed_checkbox.setToolTip("✅ İşaretli: Algoritma belirtilen seed kullanır (aynı seed → aynı yol)\n❌ İşaretsiz: Her çalıştırmada farklı yol bulunur")
+        self.seed_checkbox.stateChanged.connect(self.on_seed_checkbox_changed)
+        self.seed_checkbox.setStyleSheet("""
+            QCheckBox {
+                font-weight: bold;
+                font-size: 10px;
+                color: #3b82f6;
+            }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+            }
+        """)
+        
+        # Seed input (0-9999 arası) - Başlangıçta pasif
         self.seed_input = QSpinBox()
         self.seed_input.setRange(0, 9999)
         self.seed_input.setValue(42)  # Varsayılan seed
         self.seed_input.setPrefix("Seed: ")
-        self.seed_input.setToolTip("Aynı seed değeri aynı ağ topolojisini üretir.\nFarklı seed'ler için ağı yeniden oluşturun.")
+        self.seed_input.setToolTip("Algoritmanın rastgele kararlarını kontrol eder.\nAynı seed → Aynı yol bulunur.")
+        self.seed_input.setEnabled(False)  # Başlangıçta pasif
         self.seed_input.valueChanged.connect(self.on_seed_changed)
         
-        # Ağ Oluştur butonu
-        btn_create_network = QPushButton("🔄 Ağ Oluştur (Seed ile)")
-        btn_create_network.setFixedHeight(35)
-        btn_create_network.setCursor(Qt.CursorShape.PointingHandCursor)
-        btn_create_network.clicked.connect(self.create_network_with_seed)
-        btn_create_network.setStyleSheet("""
-            QPushButton {
-                background-color: #8b5cf6; 
-                color: white; 
-                border: none; 
-                border-radius: 6px;
-                font-weight: bold;
-                font-size: 11px;
-            }
-            QPushButton:hover { background-color: #7c3aed; }
-        """)
-        
+        layout_seed.addWidget(self.seed_checkbox)
         layout_seed.addWidget(self.seed_input)
-        layout_seed.addWidget(btn_create_network)
         
         # Seed bilgi etiketi
-        self.lbl_seed_info = QLabel("💡 Seed: 42 (Varsayılan)")
-        self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+        self.lbl_seed_info = QLabel("ℹ️ Seed kapalı (Varsayılan mod)")
+        self.lbl_seed_info.setStyleSheet("color: #6b7280; font-size: 10px; font-style: italic;")
         self.lbl_seed_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout_seed.addWidget(self.lbl_seed_info)
         
         card_seed.content_layout.addLayout(layout_seed)
         left_layout.addWidget(card_seed)
 
-        # 3. QoS Ağırlıkları (İç boşluk azaltıldı)
-        card_qos = self.create_input_card("⚖️ QoS Ağırlık Dağılımı")
+        # 3. QoS Ağırlıkları (KOMPAKT)
+        card_qos = self.create_input_card("⚖️ QoS Ağırlıkları")
         layout_qos = QVBoxLayout()
-        layout_qos.setSpacing(8) 
+        layout_qos.setSpacing(5) 
         layout_qos.setContentsMargins(0,0,0,0)
         
         self.lbl_delay = QLabel("Gecikme (Hız): %33")
@@ -794,10 +863,11 @@ class MainWindow(QMainWindow):
         right_layout.setSpacing(15) # Dikey boşluk
         right_panel.setLayout(right_layout)
 
-        # Grafik Başlığı (HEADER İLE EŞİTLENDİ)
+        # Grafik Başlığı (OPTİMİZE EDİLDİ)
         self.lbl_graph_header = QLabel("AĞ TOPOLOJİSİ - BEKLEMEDE")
         self.lbl_graph_header.setObjectName("GraphHeader")
         self.lbl_graph_header.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_graph_header.setStyleSheet("font-size: 18px; font-weight: bold;")  # Font optimize edildi
         # Buna da aynı gölgeyi verelim
         shadow_g = QGraphicsDropShadowEffect()
         shadow_g.setBlurRadius(20)
@@ -827,12 +897,13 @@ class MainWindow(QMainWindow):
         if doc is not None:
             doc.setMaximumBlockCount(1000)  # Maksimum 1000 satır - performans
 
-        # Dashboard Alanı (BÜYÜTÜLDÜ)
+        # Dashboard Alanı (OPTİMİZE EDİLDİ)
         dashboard_widget = QWidget()
-        dashboard_widget.setFixedHeight(120) # Yükseklik 100 -> 120
+        dashboard_widget.setMinimumHeight(100)
+        dashboard_widget.setMaximumHeight(130)  # Dinamik yükseklik
         self.dash_layout = QHBoxLayout()
         self.dash_layout.setContentsMargins(0, 0, 0, 0)
-        self.dash_layout.setSpacing(20)
+        self.dash_layout.setSpacing(15)  # Spacing azaltıldı
         dashboard_widget.setLayout(self.dash_layout)
         
         self.card_delay = self.create_metric_card("⏱️ GECİKME", "-", "#ff6b6b")
@@ -892,8 +963,11 @@ class MainWindow(QMainWindow):
         return card
 
     def create_metric_card(self, title, value, accent_color):
+        """Metrik kartı oluştur (Optimize edilmiş layout)"""
         card = QFrame()
         card.setObjectName("MetricCard")
+        card.setMinimumHeight(80)  # Minimum yükseklik
+        card.setMaximumHeight(110)  # Maksimum yükseklik
         shadow = QGraphicsDropShadowEffect()
         shadow.setBlurRadius(15)
         shadow.setOffset(0, 3)
@@ -902,10 +976,13 @@ class MainWindow(QMainWindow):
         
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.setSpacing(5)  # Elementler arası boşluk
+        layout.setContentsMargins(10, 10, 10, 10)
         
         lbl_title = QLabel(title)
         lbl_title.setObjectName("MetricTitle")
         lbl_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        lbl_title.setStyleSheet("font-size: 12px; font-weight: bold;")  # Font optimize
         
         lbl_value = QLabel(value)
         lbl_value.setObjectName("MetricValue")
@@ -913,7 +990,7 @@ class MainWindow(QMainWindow):
         
         line = QFrame()
         line.setFixedWidth(50)
-        line.setFixedHeight(4)
+        line.setFixedHeight(3)  # Çizgi inceldi
         line.setStyleSheet(f"background-color: {accent_color}; border: none; border-radius: 2px;")
         
         layout.addWidget(lbl_title)
@@ -1005,10 +1082,45 @@ class MainWindow(QMainWindow):
         self.log_console.clear()
 
     def on_calculate_click(self):
+        """Rota Hesapla butonuna basıldığında:
+        1. CSV yüklü değilse hata göster
+        2. Seed checkbox işaretliyse: CSV'yi seed ile yükle
+        3. Seed checkbox işaretsizse: CSV'yi varsayılan seed ile yükle
+        4. Rotayı hesapla
+        """
+        # 1. CSV yüklü mü kontrol et
+        if not hasattr(self, 'csv_loaded') or not self.csv_loaded:
+            self.lbl_graph_header.setText("⚠️ HATA: ÖNCE CSV DOSYALARİNİ YÜKLEYİN!")
+            try:
+                self.append_console("[HATA] CSV dosyaları yüklenmeden rota hesaplanamaz!", "error")
+            except:
+                pass
+            return
+        
+        # 2. CSV'yi yükle (Görsel düzenleme sabit, seed sadece algoritmaları etkiler)
+        try:
+            # Sabit görsel düzenleme (layout) - Ağ yapısı değişmez
+            G, pos, success = self.manager.build_from_csv(
+                self.csv_node_file, 
+                self.csv_edge_file, 
+                seed=42  # Görsel için sabit seed
+            )
+            if success:
+                self.G = G
+                self.network_pos = pos
+                self.canvas.draw_network(self.G, self.network_pos)
+                try:
+                    self.append_console(f"[CSV] Ağ yüklendi - Rota hesaplamaya hazır", "success")
+                except:
+                    pass
+        except Exception as e:
+            self.lbl_graph_header.setText(f"⚠️ HATA: CSV YÜKLENEMEDİ ({str(e)[:20]})")
+            return
+        
+        # 3. Kaynak/Hedef ve parametreleri al
         try:
             s = int(self.combo_source.currentText())
             t = int(self.combo_target.currentText())
-            # arayüzde algoritma ve demet bilgileri al
             selected_algo = self.combo_algo.currentText()
             demand_text = self.input_demand.text()
             demand = int(float(demand_text)) if demand_text else 100
@@ -1026,7 +1138,14 @@ class MainWindow(QMainWindow):
         algo_map = {0: 'pso', 1: 'qlearning', 2: 'genetic', 3: 'sa'}
         algo_key = algo_map.get(algo_index, 'pso')
         algo_params = self.algo_params[algo_key]
+        
+        # Seed parametresini ekle (checkbox işaretliyse)
+        if self.seed_checkbox.isChecked():
+            algo_params['seed'] = self.seed_input.value()
+        else:
+            algo_params['seed'] = None  # Rastgele davranış
 
+        # 4. Rotayı hesapla (seed dahil)
         result = self.manager.calculate_path(s,t,w_d,w_r,w_res,algorithm=selected_algo,demand_value=demand,algo_params=algo_params)
         if result:
             self.current_path = result["path"]
@@ -1035,7 +1154,9 @@ class MainWindow(QMainWindow):
             self.card_res.findChild(QLabel, "MetricValue").setText(f"{result['resource_cost']:.2f}")
             self.highlight_cards()
             
-            self.lbl_graph_header.setText(f"ROTA HESAPLANDI: DÜĞÜM {s} ➝ DÜĞÜM {t}")
+            # Seed bilgisini header'a ekle
+            seed_info = f" [SEED: {self.seed_input.value()}]" if self.seed_checkbox.isChecked() else ""
+            self.lbl_graph_header.setText(f"ROTA HESAPLANDI{seed_info}: DÜĞÜM {s} ➝ DÜĞÜM {t}")
             self.lbl_graph_header.setProperty("active", "true")
             style = self.lbl_graph_header.style()
             if style:
