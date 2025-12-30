@@ -319,6 +319,7 @@ class MainWindow(QMainWindow):
         self.network_pos = None  # NetworkX düğüm pozisyonları (Qt.pos() ile karışmaması için)
         self.comparison_results = []  # Karşılaştırma ekranı sonuçları
         self.batch_test_results = []  # Toplu test sonuçları (30 senaryo)
+        self.current_seed = None  # Ağ topolojisi seed değeri (tekrarlanabilirlik için)
         
         # Algoritma parametreleri - Her algoritma için varsayılan değerler
         self.algo_params = {
@@ -361,7 +362,10 @@ class MainWindow(QMainWindow):
         # sys.stderr = self.stdout_stream
         
         self.manager = TopologyManager()
-        self.G, self.network_pos = self.manager.create_network()
+        
+        # İlk ağ oluşturma - Varsayılan seed ile (42)
+        self.current_seed = 42
+        self.G, self.network_pos = self.manager.create_network(seed=self.current_seed)
 
         self.init_ui()
         self.setup_stdout_redirect()  # UI oluştuktan sonra redirect aktifleştir
@@ -381,6 +385,53 @@ class MainWindow(QMainWindow):
         # İlk gösterimde layout'ları zorla güncelle
         if hasattr(self, 'canvas'):
             QTimer.singleShot(100, lambda: self.canvas.draw_idle())
+    
+    # ===== SEED MANAGEMENT =====
+    
+    def on_seed_changed(self, value):
+        """
+        Seed değeri değiştiğinde bilgi etiketini günceller.
+        Ağı yeniden oluşturmaz, sadece görsel feedback verir.
+        """
+        self.lbl_seed_info.setText(f"💡 Seed: {value} (Henüz uygulanmadı)")
+        self.lbl_seed_info.setStyleSheet("color: #f59e0b; font-size: 10px; font-style: italic;")
+    
+    def create_network_with_seed(self):
+        """
+        Kullanıcının girdiği seed değeri ile yeni ağ topolojisi oluşturur.
+        Aynı seed değeri her zaman aynı ağı üretir.
+        """
+        seed_value = self.seed_input.value()
+        self.current_seed = seed_value
+        
+        # Yeni ağ oluştur
+        self.G, self.network_pos = self.manager.create_network(seed=seed_value)
+        
+        # Combobox'ları güncelle
+        self.populate_combos()
+        
+        # Grafiği çiz
+        self.canvas.draw_network(self.G, self.network_pos)
+        
+        # Bilgi etiketini güncelle
+        self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (Aktif)")
+        self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+        
+        # Header güncelle
+        node_count = len(self.G.nodes())
+        edge_count = len(self.G.edges())
+        self.lbl_graph_header.setText(f"AĞ OLUŞTURULDU (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
+        
+        # Konsola log
+        self.append_console(f"[SİSTEM] Ağ topolojisi oluşturuldu (Seed: {seed_value}, Düğüm: {node_count}, Kenar: {edge_count})", "success")
+        
+        # Metrikleri sıfırla
+        self.current_path = None
+        self.card_delay.findChild(QLabel, "MetricValue").setText("-")
+        self.card_rel.findChild(QLabel, "MetricValue").setText("-")
+        self.card_res.findChild(QLabel, "MetricValue").setText("-")
+        
+    # ===== FILE OPERATIONS =====
         
     def load_graph_from_file(self):
         """Hocanın CSV dosyalarını sırayla yükler ve arayüzü günceller."""
@@ -613,6 +664,49 @@ class MainWindow(QMainWindow):
         
         card_route.content_layout.addLayout(layout_route)
         left_layout.addWidget(card_route)
+
+        # 2.5 SEED AYARI (Yeni Eklenen)
+        card_seed = self.create_input_card("🎲 Ağ Topoloji Seed'i")
+        layout_seed = QVBoxLayout()
+        layout_seed.setSpacing(8)
+        layout_seed.setContentsMargins(0, 5, 0, 5)
+        
+        # Seed input (0-9999 arası)
+        self.seed_input = QSpinBox()
+        self.seed_input.setRange(0, 9999)
+        self.seed_input.setValue(42)  # Varsayılan seed
+        self.seed_input.setPrefix("Seed: ")
+        self.seed_input.setToolTip("Aynı seed değeri aynı ağ topolojisini üretir.\nFarklı seed'ler için ağı yeniden oluşturun.")
+        self.seed_input.valueChanged.connect(self.on_seed_changed)
+        
+        # Ağ Oluştur butonu
+        btn_create_network = QPushButton("🔄 Ağ Oluştur (Seed ile)")
+        btn_create_network.setFixedHeight(35)
+        btn_create_network.setCursor(Qt.CursorShape.PointingHandCursor)
+        btn_create_network.clicked.connect(self.create_network_with_seed)
+        btn_create_network.setStyleSheet("""
+            QPushButton {
+                background-color: #8b5cf6; 
+                color: white; 
+                border: none; 
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 11px;
+            }
+            QPushButton:hover { background-color: #7c3aed; }
+        """)
+        
+        layout_seed.addWidget(self.seed_input)
+        layout_seed.addWidget(btn_create_network)
+        
+        # Seed bilgi etiketi
+        self.lbl_seed_info = QLabel("💡 Seed: 42 (Varsayılan)")
+        self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+        self.lbl_seed_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_seed.addWidget(self.lbl_seed_info)
+        
+        card_seed.content_layout.addLayout(layout_seed)
+        left_layout.addWidget(card_seed)
 
         # 3. QoS Ağırlıkları (İç boşluk azaltıldı)
         card_qos = self.create_input_card("⚖️ QoS Ağırlık Dağılımı")

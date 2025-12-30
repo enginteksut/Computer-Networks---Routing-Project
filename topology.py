@@ -60,10 +60,15 @@ class TopologyManager:
         self.pos = None  # Düğüm pozisyonları
         self.num_nodes = 250  # Varsayılan düğüm sayısı
 
-    def create_network(self):
+    def create_network(self, seed=None):
         """
         Erdős-Rényi rastgele graf modeli ile ağ topolojisi oluşturur.
         Trade-off mekanizması ile link tiplerine göre QoS parametreleri atar.
+        
+        Args:
+            seed (int, optional): Rastgele sayı üreteci tohum değeri.
+                                  Aynı seed değeri ile aynı ağ topolojisi üretilir.
+                                  None ise her çalıştırmada farklı ağ oluşur.
         
         Returns:
             tuple: (G, pos) - NetworkX graf ve düğüm pozisyonları
@@ -72,10 +77,18 @@ class TopologyManager:
             - fiber: bw=800-1000 Mbps, delay=1-5ms, reliability=0.90-0.95
             - microwave: bw=300-600 Mbps, delay=5-10ms, reliability=0.95-0.98
             - satellite: bw=10-100 Mbps, delay=20-50ms, reliability=0.99-0.9999
+        
+        Seed Kullanımı:
+            >>> tm = TopologyManager()
+            >>> G1, pos1 = tm.create_network(seed=42)
+            >>> G2, pos2 = tm.create_network(seed=42)  # G1 ile aynı ağ
         """
+        # Seed ayarla - Tüm rastgele işlemleri etkiler
+        if seed is not None:
+            random.seed(seed)
+        
         # 1. Topoloji Oluşturma (Erdős-Rényi Modeli)
-        # Seed=None: Her çalıştırmada farklı ağ yapısı üretilir
-        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.04, seed=None) 
+        self.G = nx.erdos_renyi_graph(n=self.num_nodes, p=0.04, seed=seed) 
         
         # 2. Bağlantı Garantisi - Kopuk bileşenleri birleştir
         # Eğer graf bağlantılı değilse (disconnected), ayrı parçaları köprü kenarlarla bağla
@@ -88,7 +101,9 @@ class TopologyManager:
                 self.G.add_edge(u, v)
        
         # 3. Düğüm Konumlarını Belirle (Spring layout - görselleştirme için)
-        self.pos = nx.spring_layout(self.G, seed=42)
+        # Görselleştirme seed'i sabit tutarak konumların tutarlı olmasını sağla
+        layout_seed = seed if seed is not None else 42
+        self.pos = nx.spring_layout(self.G, seed=layout_seed)
 
         # 4. Düğüm QoS Özelliklerini Ata
         # Her düğüme işlem gecikmesi ve güvenilirlik atanır

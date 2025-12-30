@@ -122,6 +122,45 @@ python main.py
    - "Hesapla ve Çiz" butonuyla rotayı bulun
    - Sonuçlar sağ panelde görüntülenir
 
+### 🎲 Seed Mekanizması (Tekrarlanabilir Testler)
+
+**Ağ Topolojisi Seed'i**, aynı ağ yapısını tekrar tekrar oluşturmanıza olanak tanır:
+
+1. **Seed Değeri Girme:**
+   - Ana ekranda "🎲 Ağ Topoloji Seed'i" kartında seed değerini girin (0-9999)
+   - Varsayılan seed: **42**
+
+2. **Ağ Oluşturma:**
+   - "🔄 Ağ Oluştur (Seed ile)" butonuna tıklayın
+   - Aynı seed değeri her zaman **aynı ağ topolojisini** üretir
+
+3. **Test Senaryoları:**
+   ```
+   Seed: 42  → Ağ A (250 düğüm, ~2450 kenar)
+   Seed: 123 → Ağ B (250 düğüm, ~2480 kenar)
+   Seed: 42  → Ağ A (tekrar - özdeş yapı)
+   ```
+
+4. **Algoritma Karşılaştırması:**
+   - **Aynı seed** ile 5 farklı algoritma çalıştırın
+   - Sonuçlar **karşılaştırılabilir** olur (aynı ağ yapısı)
+   - Farklı QoS ağırlıkları ile testler yapılabilir
+
+**Örnek Kullanım:**
+```python
+# topology.py içinde
+tm = TopologyManager()
+G1, pos1 = tm.create_network(seed=42)  # Ağ A
+G2, pos2 = tm.create_network(seed=42)  # Ağ A (özdeş)
+G3, pos3 = tm.create_network(seed=99)  # Ağ B (farklı)
+```
+
+**Avantajlar:**
+- ✅ Aynı ağ üzerinde 5 algoritmanın adil karşılaştırması
+- ✅ Test sonuçlarının tekrarlanabilirliği
+- ✅ Hata ayıklama ve debugging kolaylığı
+- ✅ Rapor ve sunum için tutarlı veriler
+
 ### Karşılaştırma Ekranı
 
 1. Karşılaştırmak istediğiniz algoritmaları seçin (checkbox)
@@ -275,7 +314,57 @@ pip install PyQt5==5.15.9
 
 ---
 
-## 📚 Kaynaklar ve Referanslar
+## � Seed Bilgisi ve Tekrarlanabilirlik
+
+### Varsayılan Seed Değeri
+**Seed: 42** (Uygulama başlangıcında otomatik yüklenir)
+
+### Seed Kullanımı
+
+Proje, **tekrarlanabilir test sonuçları** için seed mekanizması kullanır:
+
+```python
+# Aynı seed → Aynı ağ topolojisi
+tm = TopologyManager()
+G1, pos1 = tm.create_network(seed=42)  # Ağ yapısı A
+G2, pos2 = tm.create_network(seed=42)  # Ağ yapısı A (özdeş)
+
+# Farklı seed → Farklı ağ topolojisi
+G3, pos3 = tm.create_network(seed=123) # Ağ yapısı B
+```
+
+### Test Senaryoları
+
+Rapor için kullanılan test seed değerleri:
+
+| Senaryo | Seed | Düğüm | Kenar | Açıklama |
+|---------|------|-------|-------|----------|
+| **Test 1** | 42 | 250 | ~2450 | Varsayılan test ağı |
+| **Test 2** | 123 | 250 | ~2480 | Yoğun bağlantılı ağ |
+| **Test 3** | 999 | 250 | ~2420 | Seyrek bağlantılı ağ |
+| **Test 4** | 2025 | 250 | ~2465 | Dengeli ağ |
+| **Test 5** | 1337 | 250 | ~2455 | Karışık topoloji |
+
+### Seed ile Algoritma Karşılaştırması
+
+**Aynı ağ üzerinde 5 algoritmanın adil karşılaştırması:**
+
+```bash
+# 1. Seed belirle (örnek: 42)
+# 2. Ağ oluştur
+# 3. Her algoritma ile aynı kaynak-hedef çifti test et:
+   - Q-Learning (seed=42)
+   - PSO (seed=42)
+   - Genetik Algoritma (seed=42)
+   - Benzetimli Tavlama (seed=42)
+   - Dijkstra (seed=42)
+```
+
+**Sonuç:** Tüm algoritmalar **özdeş ağ yapısı** üzerinde çalıştığı için performans farkları **algoritma özelliklerinden** kaynaklanır.
+
+---
+
+## �📚 Kaynaklar ve Referanslar
 
 1. **NetworkX Documentation**: https://networkx.org/documentation/stable/
 2. **PyQt5 Tutorial**: https://www.riverbankcomputing.com/static/Docs/PyQt5/
