@@ -31,13 +31,17 @@ Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyon
 ## 🖥️ Ekran Görüntüleri
 
 ### Ana Ekran (Tek Algoritma Modu)
-![Ana Ekran](screenshots/main_screen.png)
+![Ana Ekran](screenshots/Ana_Ekran.png)
 
 ### Karşılaştırma Ekranı (Multi-Algoritma)
-![Karşılaştırma Ekranı](screenshots/comparison_screen.png)
+![Karşılaştırma Ekranı](screenshots/Karşılaştır.png)
 
 ### Raporlar Ekranı
-![Raporlar Ekranı](screenshots/reports_screen.png)
+![Raporlar Ekranı](screenshots/Rapor1.png)
+![Raporlar Ekranı](screenshots/Rapor2.png)
+
+### Konsol Ekranı
+![Konsol Ekranı](screenshots/Konsol.png)
 
 ---
 
