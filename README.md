@@ -8,14 +8,13 @@
 
 ## 📋 Proje Özeti
 
-Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyonu** problemini ele almaktadır. Kullanıcı dostu PyQt5 arayüzü ile 5 farklı optimizasyon algoritmasını karşılaştırmalı olarak test edebilirsiniz.
+Bu proje, **çoklu QoS (Quality of Service) kısıtlı ağ rotalama optimizasyonu** problemini ele almaktadır. Kullanıcı dostu PyQt5 arayüzü ile 4 farklı optimizasyon algoritmasını karşılaştırmalı olarak test edebilirsiniz.
 
 ### 🎯 Temel Özellikler
 
 - **Trade-off Mekanizması**: Fiber (hızlı-riskli), Microwave (dengeli), Satellite (yavaş-güvenli) link tipleri
 - **3 QoS Kriteri**: Gecikme (Delay), Güvenilirlik (Reliability), Kaynak Kullanımı (Resource)
-- **5 Algoritma Desteği**: 
-  - Dijkstra (Baseline)
+- **4 Algoritma Desteği**: 
   - Q-Learning (Pekiştirmeli Öğrenme)
   - PSO (Parçacık Sürü Optimizasyonu)
   - Genetik Algoritma (Evrimsel Hesaplama)
@@ -228,7 +227,6 @@ project/
 
 | Algoritma | Hız | Çözüm Kalitesi | Bellek Kullanımı | En İyi Senaryo |
 |-----------|-----|----------------|------------------|----------------|
-| **Dijkstra** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Küçük ağlar, hızlı sonuç |
 | **Q-Learning** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | Dinamik ağlar, öğrenme gerekli |
 | **PSO** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Global optimum aranıyor |
 | **Genetik** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | Karmaşık kısıtlar |
