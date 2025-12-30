@@ -401,35 +401,49 @@ class MainWindow(QMainWindow):
         Kullanıcının girdiği seed değeri ile yeni ağ topolojisi oluşturur.
         Aynı seed değeri her zaman aynı ağı üretir.
         """
-        seed_value = self.seed_input.value()
-        self.current_seed = seed_value
-        
-        # Yeni ağ oluştur
-        self.G, self.network_pos = self.manager.create_network(seed=seed_value)
-        
-        # Combobox'ları güncelle
-        self.populate_combos()
-        
-        # Grafiği çiz
-        self.canvas.draw_network(self.G, self.network_pos)
-        
-        # Bilgi etiketini güncelle
-        self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (Aktif)")
-        self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
-        
-        # Header güncelle
-        node_count = len(self.G.nodes())
-        edge_count = len(self.G.edges())
-        self.lbl_graph_header.setText(f"AĞ OLUŞTURULDU (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
-        
-        # Konsola log
-        self.append_console(f"[SİSTEM] Ağ topolojisi oluşturuldu (Seed: {seed_value}, Düğüm: {node_count}, Kenar: {edge_count})", "success")
-        
-        # Metrikleri sıfırla
-        self.current_path = None
-        self.card_delay.findChild(QLabel, "MetricValue").setText("-")
-        self.card_rel.findChild(QLabel, "MetricValue").setText("-")
-        self.card_res.findChild(QLabel, "MetricValue").setText("-")
+        try:
+            seed_value = self.seed_input.value()
+            self.current_seed = seed_value
+            
+            # Yeni ağ oluştur
+            self.G, self.network_pos = self.manager.create_network(seed=seed_value)
+            
+            # Combobox'ları güncelle
+            if hasattr(self, 'combo_source') and hasattr(self, 'combo_target'):
+                self.populate_combos()
+            
+            # Grafiği çiz
+            if hasattr(self, 'canvas'):
+                self.canvas.draw_network(self.G, self.network_pos)
+            
+            # Bilgi etiketini güncelle
+            self.lbl_seed_info.setText(f"✅ Seed: {seed_value} (Aktif)")
+            self.lbl_seed_info.setStyleSheet("color: #10b981; font-size: 10px; font-style: italic;")
+            
+            # Header güncelle
+            node_count = len(self.G.nodes())
+            edge_count = len(self.G.edges())
+            if hasattr(self, 'lbl_graph_header'):
+                self.lbl_graph_header.setText(f"AĞ OLUŞTURULDU (SEED: {seed_value}): {node_count} DÜĞÜM / {edge_count} KENAR")
+            
+            # Konsola log (eğer konsol hazırsa)
+            try:
+                self.append_console(f"[SİSTEM] Ağ topolojisi oluşturuldu (Seed: {seed_value}, Düğüm: {node_count}, Kenar: {edge_count})", "success")
+            except:
+                pass  # Konsol henüz hazır değilse sessizce geç
+            
+            # Metrikleri sıfırla
+            self.current_path = None
+            if hasattr(self, 'card_delay'):
+                self.card_delay.findChild(QLabel, "MetricValue").setText("-")
+                self.card_rel.findChild(QLabel, "MetricValue").setText("-")
+                self.card_res.findChild(QLabel, "MetricValue").setText("-")
+                
+        except Exception as e:
+            # Hata durumunda kullanıcıya bilgi ver
+            self.lbl_seed_info.setText(f"❌ Hata: {str(e)[:30]}")
+            self.lbl_seed_info.setStyleSheet("color: #ef4444; font-size: 10px; font-style: italic;")
+            print(f"Seed ağ oluşturma hatası: {e}")
         
     # ===== FILE OPERATIONS =====
         
